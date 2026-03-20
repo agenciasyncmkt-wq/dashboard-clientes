@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Clientes - Loja de Acessórios</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fff9fb 0%, #ffffff 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(255, 192, 203, 0.15);
+        }
+
+        header h1 {
+            color: #ff69b4;
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        /* Abas */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .tab-btn {
+            padding: 12px 30px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            color: #999;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            bottom: -2px;
+        }
+
+        .tab-btn:hover {
+            color: #ff69b4;
+        }
+
+        .tab-btn.active {
+            color: #ff69b4;
+            border-bottom-color: #ff69b4;
+        }
+
+        /* Conteúdo das abas */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Formulário */
+        .form-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 15px rgba(255, 192, 203, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="tel"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #f0f0f0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        input[type="tel"]:focus {
+            outline: none;
+            border-color: #ff69b4;
+            box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.1);
+        }
+
+        /* Botões */
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #ff69b4;
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: #ff1493;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3);
+        }
+
+        .btn-danger {
+            background: #ff6b9d;
+            color: white;
+            padding: 8px 15px;
+            font-size: 0.85em;
+        }
+
+        .btn-danger:hover {
+            background: #ff1493;
+        }
+
+        /* Seção de Clientes */
+        .clients-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 15px rgba(255, 192, 203, 0.1);
+        }
+
+        .search-box {
+            margin-bottom: 25px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #f0f0f0;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        /* Tabela */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #fff0f5;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            color: #ff69b4;
+            font-weight: 600;
+            border-bottom: 2px solid #ffe0f0;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tr:hover {
+            background: #fff9fb;
+        }
+
+        .upcoming-birthday {
+            background: #fff0f5 !important;
+            font-weight: 500;
+        }
+
+        .upcoming-birthday td {
+            color: #ff69b4;
+        }
+
+        .action-cell {
+            text-align: center;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        /* Pop-up de aniversário */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(255, 105, 180, 0.2);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-content h2 {
+            color: #ff69b4;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+
+        .modal-content p {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .birthday-info {
+            background: #fff0f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #ff69b4;
+        }
+
+        .birthday-info .name {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #ff69b4;
+            margin-bottom: 5px;
+        }
+
+        .birthday-info .date {
+            color: #999;
+            font-size: 0.95em;
+        }
+
+        .btn-close-modal {
+            background: #ff69b4;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-close-modal:hover {
+            background: #ff1493;
+        }
+
+        /* Validação */
+        .error {
+            color: #ff6b9d;
+            font-size: 0.85em;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        input.invalid {
+            border-color: #ff6b9d !important;
+        }
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.5em;
+            }
+
+            .tabs {
+                gap: 5px;
+            }
+
+            .tab-btn {
+                padding: 10px 15px;
+                font-size: 0.9em;
+            }
+
+            .form-card,
+            .clients-section {
+                padding: 20px;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+
+            .modal-content {
+                margin: 20px;
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>✨ Meus Clientes</h1>
+            <p>Gestão de relacionamento com clientes - Loja de Acessórios</p>
+        </header>
+
+        <!-- Abas -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('cadastro')">➕ Cadastrar Cliente</button>
+            <button class="tab-btn" onclick="switchTab('clientes')">👥 Clientes</button>
+        </div>
+
+        <!-- Aba Cadastro -->
+        <div id="cadastro" class="tab-content active">
+            <div class="form-card">
+                <h2 style="color: #ff69b4; margin-bottom: 25px;">Novo Cliente</h2>
+                
+                <div class="form-group">
+                    <label for="nome">Nome Completo *</label>
+                    <input type="text" id="nome" placeholder="Digite o nome completo">
+                    <div class="error" id="erro-nome">Por favor, preencha o nome</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="dataNascimento">Data de Nascimento *</label>
+                    <input type="date" id="dataNascimento">
+                    <div class="error" id="erro-data">Por favor, selecione uma data</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="whatsapp">WhatsApp *</label>
+                    <input type="tel" id="whatsapp" placeholder="(11) 99999-9999">
+                    <div class="error" id="erro-whatsapp">Por favor, preencha o WhatsApp</div>
+                </div>
+
+                <button class="btn-primary" onclick="salvarCliente()">Salvar Cliente</button>
+            </div>
+        </div>
+
+        <!-- Aba Clientes -->
+        <div id="clientes" class="tab-content">
+            <div class="clients-section">
+                <h2 style="color: #ff69b4; margin-bottom: 20px;">Lista de Clientes</h2>
+                
+                <div class="search-box">
+                    <input type="text" id="busca" placeholder="🔍 Buscar cliente por nome..." onkeyup="filtrarClientes()">
+                </div>
+
+                <div class="table-responsive" id="tabelaContainer">
+                    <!-- Tabela será preenchida por JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Aniversário -->
+    <div id="modalAniversario" class="modal" onclick="fecharModalAniversario(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h2>🎉 Aniversariante!</h2>
+            <p>Você tem um cliente fazendo aniversário em breve!</p>
+            
+            <div class="birthday-info" id="infoBirthdayModal">
+                <!-- Preenchido por JavaScript -->
+            </div>
+
+            <p style="color: #ff69b4; font-weight: 600; margin-bottom: 20px;">
+                ✉️ Não esqueça de enviar uma mensagem especial no WhatsApp!
+            </p>
+
+            <button class="btn-close-modal" onclick="fecharModalAniversario()">Fechar</button>
+        </div>
+    </div>
+
+    <script>
+        // ========== GERENCIAMENTO DE DADOS ==========
+        
+        // Carrega clientes do LocalStorage
+        function carregarClientes() {
+            const dados = localStorage.getItem('clientes');
+            return dados ? JSON.parse(dados) : [];
+        }
+
+        // Salva clientes no LocalStorage
+        function salvarClientes(clientes) {
+            localStorage.setItem('clientes', JSON.stringify(clientes));
+        }
+
+        // ========== VALIDAÇÃO ==========
+        
+        function validarCampo(id, errorId) {
+            const campo = document.getElementById(id);
+            const erro = document.getElementById(errorId);
+            
+            if (!campo.value.trim()) {
+                campo.classList.add('invalid');
+                erro.classList.add('show');
+                return false;
+            }
+            
+            campo.classList.remove('invalid');
+            erro.classList.remove('show');
+            return true;
+        }
+
+        // ========== MÁSCARA DE WHATSAPP ==========
+        
+        document.getElementById('whatsapp')?.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            if (value.length > 0) {
+                if (value.length <= 2) {
+                    value = `(${value}`;
+                } else if (value.length <= 7) {
+                    value = `(${value.slice(0, 2)}) ${value.slice(2)}`;
+                } else {
+                    value = `(${value.slice(0, 2)}) ${value.slice(2, 7)}-${value.slice(7, 11)}`;
+                }
+            }
+            
+            e.target.value = value;
+        });
+
+        // ========== CADASTRO ==========
+        
+        function salvarCliente() {
+            const valido = validarCampo('nome', 'erro-nome') &&
+                          validarCampo('dataNascimento', 'erro-data') &&
+                          validarCampo('whatsapp', 'erro-whatsapp');
+            
+            if (!valido) return;
+
+            const nome = document.getElementById('nome').value;
+            const dataNascimento = document.getElementById('dataNascimento').value;
+            const whatsapp = document.getElementById('whatsapp').value;
+
+            const clientes = carregarClientes();
+            
+            const novoCliente = {
+                id: Date.now(),
+                nome,
+                dataNascimento,
+                whatsapp
+            };
+
+            clientes.push(novoCliente);
+            salvarClientes(clientes);
+
+            // Limpar formulário
+            document.getElementById('nome').value = '';
+            document.getElementById('dataNascimento').value = '';
+            document.getElementById('whatsapp').value = '';
+
+            alert('✅ Cliente cadastrado com sucesso!');
+            
+            // Atualizar tabela
+            atualizarTabela();
+        }
+
+        // ========== EXIBIÇÃO DE CLIENTES ==========
+        
+        function atualizarTabela() {
+            const clientes = carregarClientes();
+            const container = document.getElementById('tabelaContainer');
+
+            if (clientes.length === 0) {
+                container.innerHTML = '<div class="empty-message">Nenhum cliente cadastrado ainda</div>';
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Data de Nascimento</th>
+                            <th>WhatsApp</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            clientes.forEach(cliente => {
+                const ehAniversariante = verificarAniversariante(cliente.dataNascimento);
+                const classe = ehAniversariante ? 'upcoming-birthday' : '';
+                const dataBR = new Date(cliente.dataNascimento).toLocaleDateString('pt-BR');
+
+                html += `
+                    <tr class="${classe}">
+                        <td><strong>${cliente.nome}</strong></td>
+                        <td>${dataBR}</td>
+                        <td>${cliente.whatsapp}</td>
+                        <td class="action-cell">
+                            <button class="btn-danger" onclick="deletarCliente(${cliente.id})">Deletar</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // ========== BUSCA ==========
+        
+        function filtrarClientes() {
+            const busca = document.getElementById('busca').value.toLowerCase();
+            const clientes = carregarClientes();
+            const container = document.getElementById('tabelaContainer');
+
+            const clientesFiltrados = clientes.filter(c => 
+                c.nome.toLowerCase().includes(busca)
+            );
+
+            if (clientesFiltrados.length === 0) {
+                container.innerHTML = '<div class="empty-message">Nenhum cliente encontrado</div>';
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Data de Nascimento</th>
+                            <th>WhatsApp</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            clientesFiltrados.forEach(cliente => {
+                const ehAniversariante = verificarAniversariante(cliente.dataNascimento);
+                const classe = ehAniversariante ? 'upcoming-birthday' : '';
+                const dataBR = new Date(cliente.dataNascimento).toLocaleDateString('pt-BR');
+
+                html += `
+                    <tr class="${classe}">
+                        <td><strong>${cliente.nome}</strong></td>
+                        <td>${dataBR}</td>
+                        <td>${cliente.whatsapp}</td>
+                        <td class="action-cell">
+                            <button class="btn-danger" onclick="deletarCliente(${cliente.id})">Deletar</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // ========== DELETAR ==========
+        
+        function deletarCliente(id) {
+            if (!confirm('Tem certeza que deseja deletar este cliente?')) return;
+
+            const clientes = carregarClientes();
+            const clientesFiltrados = clientes.filter(c => c.id !== id);
+            
+            salvarClientes(clientesFiltrados);
+            atualizarTabela();
+        }
+
+        // ========== SISTEMA DE ANIVERSÁRIO ==========
+        
+        function verificarAniversariante(dataNascimento) {
+            const hoje = new Date();
+            const data = new Date(dataNascimento);
+            
+            const dataNascYear = new Date(hoje.getFullYear(), data.getMonth(), data.getDate());
+            const proximoAniver = new Date(hoje.getFullYear(), data.getMonth(), data.getDate());
+            
+            if (dataNascYear < hoje) {
+                proximoAniver.setFullYear(hoje.getFullYear() + 1);
+            }
+            
+            const diferenca = (proximoAniver - hoje) / (1000 * 60 * 60 * 24);
+            
+            return diferenca <= 5 && diferenca >= 0;
+        }
+
+        function buscarAniversariantesProximos() {
+            const clientes = carregarClientes();
+            const aniversariantes = clientes.filter(c => verificarAniversariante(c.dataNascimento));
+            
+            return aniversariantes;
+        }
+
+        function exibirModalAniversario() {
+            const aniversariantes = buscarAniversariantesProximos();
+            
+            if (aniversariantes.length > 0) {
+                const cliente = aniversariantes[0];
+                const dataBR = new Date(cliente.dataNascimento).toLocaleDateString('pt-BR');
+                
+                document.getElementById('infoBirthdayModal').innerHTML = `
+                    <div class="name">${cliente.nome}</div>
+                    <div class="date">📅 ${dataBR}</div>
+                `;
+                
+                document.getElementById('modalAniversario').classList.add('show');
+            }
+        }
+
+        function fecharModalAniversario(event) {
+            if (event && event.target.id !== 'modalAniversario') return;
+            document.getElementById('modalAniversario').classList.remove('show');
+        }
+
+        // ========== NAVEGAÇÃO DE ABAS ==========
+        
+        function switchTab(tabName) {
+            // Ocultar todas as abas
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Desativar todos os botões
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Mostrar aba selecionada
+            document.getElementById(tabName).classList.add('active');
+
+            // Ativar botão selecionado
+            event.target.classList.add('active');
+
+            // Atualizar tabela se ir para aba de clientes
+            if (tabName === 'clientes') {
+                atualizarTabela();
+            }
+        }
+
+        // ========== INICIALIZAÇÃO ==========
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            atualizarTabela();
+            
+            // Verificar aniversariantes ao abrir
+            setTimeout(() => {
+                exibirModalAniversario();
+            }, 500);
+        });
+    </script>
+</body>
+</html>
